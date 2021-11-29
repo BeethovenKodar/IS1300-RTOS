@@ -70,7 +70,7 @@ osThreadId_t Blink2TaskHandle;
 const osThreadAttr_t Blink2Task_attributes = {
   .name = "Blink2Task",
   .stack_size = 128 * 4,
-  .priority = (osPriority_t) osPriorityNormal,
+  .priority = (osPriority_t) osPriorityAboveNormal,
 };
 /* Definitions for TriggTask */
 osThreadId_t TriggTaskHandle;
@@ -82,9 +82,7 @@ const osThreadAttr_t TriggTask_attributes = {
 
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
-
 void wait_cycles(uint32_t n);
-
 /* USER CODE END FunctionPrototypes */
 
 void StartDefaultTask(void *argument);
@@ -171,10 +169,16 @@ void StartDefaultTask(void *argument)
 void Blink1(void *argument)
 {
   /* USER CODE BEGIN Blink1 */
+  TickType_t xLastWakeTime;
+  const TickType_t xPeriod = pdMS_TO_TICKS(10);
+  xLastWakeTime = xTaskGetTickCount();
+
   /* Infinite loop */
-  for(;;)
-  {
-    osDelay(1);
+  for(;;) {
+    varBlink1 = 1;
+    wait_cycles(200000);
+    varBlink1 = 0;
+    vTaskDelayUntil(&xLastWakeTime, xPeriod);
   }
   /* USER CODE END Blink1 */
 }
@@ -189,10 +193,16 @@ void Blink1(void *argument)
 void Blink2(void *argument)
 {
   /* USER CODE BEGIN Blink2 */
+  TickType_t xLastWakeTime;
+  const TickType_t xPeriod = pdMS_TO_TICKS(20);
+  xLastWakeTime = xTaskGetTickCount();
+
   /* Infinite loop */
-  for(;;)
-  {
-    osDelay(1);
+  for(;;) {
+    varBlink2 = 1;
+    wait_cycles(400000);
+    varBlink2 = 0;
+    vTaskDelayUntil(&xLastWakeTime, xPeriod);
   }
   /* USER CODE END Blink2 */
 }
@@ -207,16 +217,25 @@ void Blink2(void *argument)
 void Trigg(void *argument)
 {
   /* USER CODE BEGIN Trigg */
+  TickType_t xLastWakeTime;
+  const TickType_t xPeriod = pdMS_TO_TICKS(200); //200ms in ticks
+   // Initialise the xLastWakeTime variable with the current time.
+  xLastWakeTime = xTaskGetTickCount();
   /* Infinite loop */
-  for(;;)
-  {
-    osDelay(1);
+  for(;;) {
+      vTaskDelayUntil(&xLastWakeTime, xPeriod);
+      wait_cycles(10);
   }
   /* USER CODE END Trigg */
 }
 
 /* Private application code --------------------------------------------------*/
 /* USER CODE BEGIN Application */
+
+void wait_cycles(uint32_t n) {
+  uint32_t l = n/3;
+  asm volatile("0:" "SUBS %[count], 1;" "BNE 0b;" :[count]"+r"(l));
+}
 
 /* USER CODE END Application */
 
