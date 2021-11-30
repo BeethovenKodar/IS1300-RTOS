@@ -181,13 +181,14 @@ void Blink1(void *argument)
     /* Infinite loop */
     for(;;) {
 	osMutexWait(blinkMutexHandle, osWaitForever);
-	osMutexRelease(blinkMutexHandle);
 
 	if (HAL_GPIO_ReadPin(LD2_GPIO_Port, LD2_Pin) == 1) {
 	    HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_RESET);
 	} else {
 	    HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_SET);
 	}
+
+	osMutexRelease(blinkMutexHandle);
 	vTaskDelayUntil(&xLastWakeTime, xPeriod);
     }
   /* USER CODE END Blink1 */
@@ -233,7 +234,7 @@ void Userbutton(void *argument)
     /* Infinite loop */
     for(;;) {
 	if (HAL_GPIO_ReadPin(B1_GPIO_Port, B1_Pin) == GPIO_PIN_RESET) {
-	    osMutexWait(blinkMutexHandle, 0);
+	    osMutexWait(blinkMutexHandle, 10);
 	} else {
 	    osMutexRelease(blinkMutexHandle);
 	}

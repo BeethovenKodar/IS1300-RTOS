@@ -486,32 +486,33 @@ void Blink1(void *argument)
  800057c:	f04f 31ff 	mov.w	r1, #4294967295	; 0xffffffff
  8000580:	4618      	mov	r0, r3
  8000582:	f003 f9ec 	bl	800395e <osMutexAcquire>
-	osMutexRelease(blinkMutexHandle);
- 8000586:	4b10      	ldr	r3, [pc, #64]	; (80005c8 <Blink1+0x64>)
- 8000588:	681b      	ldr	r3, [r3, #0]
- 800058a:	4618      	mov	r0, r3
- 800058c:	f003 fa32 	bl	80039f4 <osMutexRelease>
 
 	if (HAL_GPIO_ReadPin(LD2_GPIO_Port, LD2_Pin) == 1) {
- 8000590:	2120      	movs	r1, #32
- 8000592:	f04f 4090 	mov.w	r0, #1207959552	; 0x48000000
- 8000596:	f000 fda1 	bl	80010dc <HAL_GPIO_ReadPin>
- 800059a:	4603      	mov	r3, r0
- 800059c:	2b01      	cmp	r3, #1
- 800059e:	d106      	bne.n	80005ae <Blink1+0x4a>
+ 8000586:	2120      	movs	r1, #32
+ 8000588:	f04f 4090 	mov.w	r0, #1207959552	; 0x48000000
+ 800058c:	f000 fda6 	bl	80010dc <HAL_GPIO_ReadPin>
+ 8000590:	4603      	mov	r3, r0
+ 8000592:	2b01      	cmp	r3, #1
+ 8000594:	d106      	bne.n	80005a4 <Blink1+0x40>
 	    HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_RESET);
- 80005a0:	2200      	movs	r2, #0
- 80005a2:	2120      	movs	r1, #32
- 80005a4:	f04f 4090 	mov.w	r0, #1207959552	; 0x48000000
- 80005a8:	f000 fdb0 	bl	800110c <HAL_GPIO_WritePin>
- 80005ac:	e005      	b.n	80005ba <Blink1+0x56>
+ 8000596:	2200      	movs	r2, #0
+ 8000598:	2120      	movs	r1, #32
+ 800059a:	f04f 4090 	mov.w	r0, #1207959552	; 0x48000000
+ 800059e:	f000 fdb5 	bl	800110c <HAL_GPIO_WritePin>
+ 80005a2:	e005      	b.n	80005b0 <Blink1+0x4c>
 	} else {
 	    HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_SET);
- 80005ae:	2201      	movs	r2, #1
- 80005b0:	2120      	movs	r1, #32
- 80005b2:	f04f 4090 	mov.w	r0, #1207959552	; 0x48000000
- 80005b6:	f000 fda9 	bl	800110c <HAL_GPIO_WritePin>
+ 80005a4:	2201      	movs	r2, #1
+ 80005a6:	2120      	movs	r1, #32
+ 80005a8:	f04f 4090 	mov.w	r0, #1207959552	; 0x48000000
+ 80005ac:	f000 fdae 	bl	800110c <HAL_GPIO_WritePin>
 	}
+
+	osMutexRelease(blinkMutexHandle);
+ 80005b0:	4b05      	ldr	r3, [pc, #20]	; (80005c8 <Blink1+0x64>)
+ 80005b2:	681b      	ldr	r3, [r3, #0]
+ 80005b4:	4618      	mov	r0, r3
+ 80005b6:	f003 fa1d 	bl	80039f4 <osMutexRelease>
 	vTaskDelayUntil(&xLastWakeTime, xPeriod);
  80005ba:	f107 0308 	add.w	r3, r7, #8
  80005be:	68f9      	ldr	r1, [r7, #12]
@@ -586,10 +587,10 @@ void Userbutton(void *argument)
  8000612:	4603      	mov	r3, r0
  8000614:	2b00      	cmp	r3, #0
  8000616:	d106      	bne.n	8000626 <Userbutton+0x32>
-	    osMutexWait(blinkMutexHandle, 0);
+	    osMutexWait(blinkMutexHandle, 10);
  8000618:	4b0a      	ldr	r3, [pc, #40]	; (8000644 <Userbutton+0x50>)
  800061a:	681b      	ldr	r3, [r3, #0]
- 800061c:	2100      	movs	r1, #0
+ 800061c:	210a      	movs	r1, #10
  800061e:	4618      	mov	r0, r3
  8000620:	f003 f99d 	bl	800395e <osMutexAcquire>
  8000624:	e004      	b.n	8000630 <Userbutton+0x3c>
