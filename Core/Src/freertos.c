@@ -49,6 +49,7 @@
 
 uint8_t varBlink1 = 0;
 uint8_t varBlink2 = 0;
+uint8_t varBlink3 = 0;
 
 /* USER CODE END Variables */
 /* Definitions for defaultTask */
@@ -56,7 +57,7 @@ osThreadId_t defaultTaskHandle;
 const osThreadAttr_t defaultTask_attributes = {
   .name = "defaultTask",
   .stack_size = 128 * 4,
-  .priority = (osPriority_t) osPriorityNormal,
+  .priority = (osPriority_t) osPriorityLow,
 };
 /* Definitions for Blink1Task */
 osThreadId_t Blink1TaskHandle;
@@ -70,12 +71,19 @@ osThreadId_t Blink2TaskHandle;
 const osThreadAttr_t Blink2Task_attributes = {
   .name = "Blink2Task",
   .stack_size = 128 * 4,
-  .priority = (osPriority_t) osPriorityAboveNormal,
+  .priority = (osPriority_t) osPriorityNormal,
 };
 /* Definitions for TriggTask */
 osThreadId_t TriggTaskHandle;
 const osThreadAttr_t TriggTask_attributes = {
   .name = "TriggTask",
+  .stack_size = 128 * 4,
+  .priority = (osPriority_t) osPriorityHigh,
+};
+/* Definitions for UserbuttonTask */
+osThreadId_t UserbuttonTaskHandle;
+const osThreadAttr_t UserbuttonTask_attributes = {
+  .name = "UserbuttonTask",
   .stack_size = 128 * 4,
   .priority = (osPriority_t) osPriorityHigh,
 };
@@ -89,6 +97,7 @@ void StartDefaultTask(void *argument);
 void Blink1(void *argument);
 void Blink2(void *argument);
 void Trigg(void *argument);
+void Userbutton(void *argument);
 
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
@@ -130,6 +139,9 @@ void MX_FREERTOS_Init(void) {
 
   /* creation of TriggTask */
   TriggTaskHandle = osThreadNew(Trigg, NULL, &TriggTask_attributes);
+
+  /* creation of UserbuttonTask */
+  UserbuttonTaskHandle = osThreadNew(Userbutton, NULL, &UserbuttonTask_attributes);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
@@ -219,7 +231,7 @@ void Trigg(void *argument)
   /* USER CODE BEGIN Trigg */
   TickType_t xLastWakeTime;
   const TickType_t xPeriod = pdMS_TO_TICKS(200); //200ms in ticks
-   // Initialise the xLastWakeTime variable with the current time.
+  // Initialise the xLastWakeTime variable with the current time.
   xLastWakeTime = xTaskGetTickCount();
   /* Infinite loop */
   for(;;) {
@@ -227,6 +239,33 @@ void Trigg(void *argument)
       wait_cycles(10);
   }
   /* USER CODE END Trigg */
+}
+
+/* USER CODE BEGIN Header_Userbutton */
+/**
+* @brief Function implementing the UserbuttonTask thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_Userbutton */
+void Userbutton(void *argument)
+{
+  /* USER CODE BEGIN Userbutton */
+  TickType_t xLastWakeTime;
+  const TickType_t xPeriod = pdMS_TO_TICKS(20);
+  // Initialize the xLastWakeTime variable with the current time
+  xLastWakeTime = xTaskGetTickCount();
+
+  /* Infinite loop */
+  for(;;) {
+      if (HAL_GPIO_ReadPin(B1_GPIO_Port, B1_Pin) == GPIO_PIN_RESET) {
+	  varBlink3 = 1;
+	  wait_cycles(250000);
+	  varBlink3 = 0;
+      }
+      vTaskDelayUntil(&xLastWakeTime, xPeriod);
+  }
+  /* USER CODE END Userbutton */
 }
 
 /* Private application code --------------------------------------------------*/
